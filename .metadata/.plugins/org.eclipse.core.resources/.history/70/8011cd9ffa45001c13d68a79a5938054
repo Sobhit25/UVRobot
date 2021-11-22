@@ -1,0 +1,239 @@
+#include <main407.h>
+#include "string.h"
+
+#define FALSE 0
+#define TRUE 1
+
+void SystemClockConfig(void);
+void error_handler(void);
+
+
+void UART2_Init(void);
+UART_HandleTypeDef	huart2;
+
+//char* data = "UART Kama Karuchi \r";
+
+uint8_t data_buffer[100];
+uint8_t rcvd_data;
+uint32_t count;
+uint8_t reception_complete = FALSE;
+
+
+// By default MPU6050 is on bus address 0x68
+static int addr = 0x68;
+
+static void mpu6050_reset (void);
+static void mpu6050_read_raw (int16_t accel[3], int16_t gyro[3], int16_t *temp);
+
+void I2C2_Init(void);
+I2C_HandleTypeDef	hi2c2;
+
+int main(void)
+{
+	HAL_Init();
+    SystemClockConfig();
+
+
+
+/******************************************* UART DEMO CODE******************************************************/
+    UART2_Init();
+
+    //HAL_UART_Transmit_IT(&huart2, (uint8_t*)data, (uint16_t) strlen(data));
+
+   // while(reception_complete != TRUE)
+   // {
+   // 	HAL_UART_Receive_IT(&huart2,&rcvd_data,1);
+   // }
+
+/**************************************************************************************************************/
+
+/******************************************* I2C DEMO CODE*****************************************************/
+	I2C2_Init();
+
+	uint8_t check;
+
+	HAL_I2C_Mem_Read(&hi2c2, addr, 0x75, 1, &check, 1, HAL_MAX_DELAY);
+
+	if(check == 104){
+		mpu6050_reset();
+
+			int16_t acceleration[3], gyro[3], temp;
+			char data[13];
+
+			data[12] = 'X';
+			data[11] = '=';
+			data[9]  = ' ';
+			data[8]  = 'Y';
+			data[7]  = '=';
+			data[5]  = ' ';
+			data[4]  = 'Z';
+			data[3]  = '=';
+			data[1]  = ' ';
+			data[0] = '\n';
+
+			char data1[4];
+
+			while (1) {
+				mpu6050_read_raw(acceleration, gyro, &temp);
+
+				// These are the raw numbers from the chip, so will need tweaking to be really useful.
+				// See the datasheet for more information
+				//printf("Acc. X = %d, Y = %d, Z = %d\n", acceleration[0], acceleration[1], acceleration[2]);
+
+				data[10] = acceleration[0];
+				data[6]  = acceleration[1];
+				data[2]  = acceleration[2];
+				HAL_UART_Transmit_IT(&huart2, (uint8_t*)data, (uint16_t) strlen(data));
+				//printf("Gyro. X = %d, Y = %d, Z = %d\n", gyro[0], gyro[1], gyro[2]);
+
+				data[10] = gyro[0];
+				data[6]  = gyro[1];
+				data[2]  = gyro[2];
+				HAL_UART_Transmit_IT(&huart2, (uint8_t*)data, (uint16_t) strlen(data));
+				// Temperature is simple so use the datasheet calculation to get deg C.
+				// Note this is chip temperature.
+				//printf("Temp. = %f\n", (temp / 340.0) + 36.53);
+				data1[3] = 'T';
+				data1[2] = '=';
+				data1[1] = (temp / 340.0) + 36.53;
+				data1[0] = '\n';
+				HAL_UART_Transmit_IT(&huart2, (uint8_t*)data1, (uint16_t) strlen(data1));
+
+				//sleep_ms(100);
+			}
+	}
+
+
+/***************************************************************************************************************/
+
+    while(1);
+
+	return 0;
+}
+
+void SystemClockConfig(void)
+{
+
+}
+
+/*****************************************  UART APIS  ***************************************************/
+
+void UART2_Init(void){
+
+	huart2.Instance = USART2;
+	huart2.Init.BaudRate = 115200;
+	huart2.Init.Parity = UART_PARITY_NONE;
+	huart2.Init.StopBits = UART_STOPBITS_1;
+	huart2.Init.WordLength = UART_WORDLENGTH_8B;
+	huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart2.Init.Mode = UART_MODE_TX_RX;
+
+	if(HAL_UART_Init(&huart2) != HAL_OK){
+
+		error_handler();
+	}
+}
+
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (rcvd_data=='\r')
+	{
+		reception_complete = 1;
+		data_buffer[count++] = '\r';
+		HAL_UART_Transmit(&huart2,data_buffer,count,HAL_MAX_DELAY);
+	}
+	else
+	{
+		data_buffer[count++]=rcvd_data;
+	}
+}
+
+/********************************************   I2C APIS   **************************************************/
+
+void I2C2_Init(void){
+
+	hi2c2.Instance = I2C2;
+
+	hi2c2.Init.ClockSpeed = 400000U;
+	hi2c2.Init.DutyCycle = I2C_DUTYCYCLE_2;
+	//hi2c2.Init.OwnAddress1
+	hi2c2.Init.AddressingMode = I2C_DUTYCYCLE_2;
+	hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLED;
+
+	//hi2c2.Devaddress = addr;
+	//hi2c2.pBuffPtr
+	//hi2c2.XferSize
+	//hi2c2.State
+	//hi2c2.Mode
+
+	if(HAL_I2C_Init(&hi2c2) != HAL_OK){
+
+		error_handler();
+	}
+}
+
+static void mpu6050_reset() {
+
+    uint8_t buf[] = {0x6B, 0x00}; // Power Management
+    HAL_I2C_Master_Transmit(I2C2, addr, *buf, 2, HAL_MAX_DELAY);
+
+    buf[0] = 0x1B, buf[1] = 0x00; 		  // Gyroscope Configuration
+    HAL_I2C_Master_Transmit(I2C2, addr, *buf, 2, HAL_MAX_DELAY);
+
+    buf[0] = 0x1C, buf[1] = 0x00; 		  // Accelerometer Configuration
+    HAL_I2C_Master_Transmit(I2C2, addr, *buf, 2, HAL_MAX_DELAY);
+
+}
+
+static void mpu6050_read_raw(int16_t accel[3], int16_t gyro[3], int16_t *temp) {
+    // For this particular device, we send the device the register we want to read
+    // first, then subsequently read from the device. The register is auto incrementing
+    // so we don't need to keep sending the register we want, just the first.
+
+    uint8_t buffer[6];
+
+    // Start reading acceleration registers from register 0x3B for 6 bytes
+    uint16_t val = 0x3B;
+    //HAL_I2C_Master_Transmit(&hi2c2, addr, val, 1, HAL_MAX_DELAY); // to keep the master control of the bus
+    //HAL_I2C_Master_Receive(&hi2c2, addr, buffer, 6, HAL_MAX_DELAY);
+    HAL_I2C_Mem_Read(&hi2c2, addr, val, sizeof(val), buffer, 6, HAL_MAX_DELAY);
+
+    for (int i = 0; i < 3; i++) {
+        accel[i] = (buffer[i * 2] << 8 | buffer[(i * 2) + 1]);
+    }
+
+    // Now gyro data from reg 0x43 for 6 bytes
+    // The register is auto incrementing on each read
+    val = 0x43;
+    //HAL_I2C_Master_Transmit(&hi2c2, addr, &val, 1, HAL_MAX_DELAY); // to keep the master control of the bus
+    //HAL_I2C_Master_Receive(&hi2c2, addr, buffer, 6, HAL_MAX_DELAY);
+    HAL_I2C_Mem_Read(&hi2c2, addr, val, sizeof(val), buffer, 6, HAL_MAX_DELAY);
+
+
+    for (int i = 0; i < 3; i++) {
+        gyro[i] = (buffer[i * 2] << 8 | buffer[(i * 2) + 1]);;
+    }
+
+    // Now temperature from reg 0x41 for 2 bytes
+    // The register is auto incrementing on each read
+    val = 0x41;
+    //HAL_I2C_Master_Transmit(&hi2c2, addr, &val, 1, HAL_MAX_DELAY); // to keep the master control of the bus
+    //HAL_I2C_Master_Receive(&hi2c2, addr, buffer, 2, HAL_MAX_DELAY);
+    HAL_I2C_Mem_Read(&hi2c2, addr, val, sizeof(val), buffer, 2, HAL_MAX_DELAY);
+
+    *temp = buffer[0] << 8 | buffer[1];
+}
+
+
+
+
+
+
+
+
+
+
+void error_handler(void){
+
+}

@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;UV_RobotBSP/Core/Src/stm32f4xx_it.c&apos;" deleteContents="false" description="Delete resource &apos;UV_RobotBSP/Core/Src/stm32f4xx_it.c&apos;" element1="/UV_RobotBSP/Core/Src/stm32f4xx_it.c" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1635764071065"/>&#x0A;<refactoring comment="Delete resource &apos;UV_RobotBSP/Core/Src/stm32f4xx_hal_msp.c&apos;" deleteContents="false" description="Delete resource &apos;UV_RobotBSP/Core/Src/stm32f4xx_hal_msp.c&apos;" element1="/UV_RobotBSP/Core/Src/stm32f4xx_hal_msp.c" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1635764078597"/>
+</session>

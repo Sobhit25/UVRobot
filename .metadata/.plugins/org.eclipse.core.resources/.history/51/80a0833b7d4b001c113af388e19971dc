@@ -1,0 +1,51 @@
+/*
+ * MPU9250.c
+ *
+ *  Created on: Nov 20, 2021
+ *      Author: SOBHIT PANDA
+ */
+
+
+
+
+
+/**
+  * @brief  Register Configuration of MPU9250
+  * @param  none
+  * @retval none
+  */
+void MPU9250_Initialisation(MPU9250_t *mpu9250, I2C_HandleTypeDef *hi2c){
+	uint8_t *pData = 0x00;
+	HAL_I2C_Mem_Write(hi2c, MPU9250_Addr, PWR_MGMNT_1, 1, pData, 1, HAL_MAX_DELAY);
+
+	*pData = mpu9250->accel_range;
+	HAL_I2C_Mem_Write(hi2c, MPU9250_Addr, ACCEL_CONFIG, 1, pData, 1, HAL_MAX_DELAY);
+
+	*pData = mpu9250->gyro_range;
+	HAL_I2C_Mem_Write(hi2c, MPU9250_Addr, GYRO_CONFIG, 1, pData, 1, HAL_MAX_DELAY);
+
+	*pData = mpu9250->dlpf_bandwidth;
+	HAL_I2C_Mem_Write(hi2c, MPU9250_Addr, SMPDIV, 1, 0x07, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(hi2c, MPU9250_Addr, CONFIG, 1, pData, 1, HAL_MAX_DELAY);
+
+}
+void Get_Raw_Gyro(MPU9250_t *mpu9250, I2C_HandleTypeDef *hi2c){
+	uint8_t buffer[6];
+	HAL_I2C_Mem_Read(hi2c, MPU9250_Addr, ACCEL_OUT, 1, buffer, 6, HAL_MAX_DELAY);
+
+    mpu9250->Acc_X_RAW = (buffer[1] << 1) | buffer[0];
+    mpu9250->Acc_Y_RAW = (buffer[3] << 1) | buffer[2];
+    mpu9250->Acc_Z_RAW = (buffer[5] << 1) | buffer[4];
+}
+void Get_Raw_Accel(MPU9250_t *mpu9250, I2C_HandleTypeDef *hi2c){
+
+}
+void Get_Temperature(MPU9250_t *mpu9250, I2C_HandleTypeDef *hi2c){
+
+}
+void Get_Raw_Compass(MPU9250_t *mpu9250, I2C_HandleTypeDef *hi2c){
+
+}
+void Get_All(MPU9250_t *mpu9250, I2C_HandleTypeDef *hi2c){
+
+}

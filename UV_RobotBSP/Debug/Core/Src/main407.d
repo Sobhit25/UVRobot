@@ -27,6 +27,7 @@ Core/Src/main407.o: ../Core/Src/main407.c ../Core/Inc/main407.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
+ E:/UV_Robot/UV_RobotBSP/Device_Library/Inc/MPU9250.h \
  E:/UV_Robot/UV_RobotBSP/PID/PID.h
 
 ../Core/Inc/main407.h:
@@ -86,5 +87,7 @@ Core/Src/main407.o: ../Core/Src/main407.c ../Core/Inc/main407.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
+
+E:/UV_Robot/UV_RobotBSP/Device_Library/Inc/MPU9250.h:
 
 E:/UV_Robot/UV_RobotBSP/PID/PID.h:

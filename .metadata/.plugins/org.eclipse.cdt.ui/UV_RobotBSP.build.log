@@ -1,0 +1,10 @@
+16:34:15 **** Incremental Build of configuration Debug for project UV_RobotBSP ****
+make -j8 all 
+arm-none-eabi-size   UV_RobotBSP.elf 
+   text	   data	    bss	    dec	    hex	filename
+  16544	    120	   1744	  18408	   47e8	UV_RobotBSP.elf
+Finished building: default.size.stdout
+ 
+
+16:34:15 Build Finished. 0 errors, 0 warnings. (took 312ms)
+

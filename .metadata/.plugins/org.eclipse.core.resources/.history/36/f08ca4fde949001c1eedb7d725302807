@@ -1,0 +1,32 @@
+/*
+ * MPU9250.c
+ *
+ *  Created on: Nov 20, 2021
+ *      Author: SOBHIT PANDA
+ */
+
+
+#include "MPU9250.h"
+
+
+/**
+  * @brief  Register Configuration of MPU9250
+  * @param  none
+  * @retval none
+  */
+void MPU9250_Initialisation(MPU9250_t *mpu9250){
+	uint8_t	*pData = mpu9250->accel_range;
+	HAL_I2C_Mem_Write(&hi2c2, MPU9250_Addr, ACCEL_CONFIG, 1, pData, 1, HAL_MAX_DELAY);
+
+	*pData = mpu9250->gyro_range;
+	HAL_I2C_Mem_Write(&hi2c2, MPU9250_Addr, GYRO_CONFIG, 1, pData, 1, HAL_MAX_DELAY);
+
+	*pData = mpu9250->dlpf_bandwidth;
+	HAL_I2C_Mem_Write(&hi2c2, MPU9250_Addr, CONFIG, 1, pData, 1, HAL_MAX_DELAY);
+
+}
+void Get_Raw_Gyro(void);
+void Get_Raw_Accel(void);
+void Get_Temperature(void);
+void Get_Raw_Compass(void);
+void Get_All(void);

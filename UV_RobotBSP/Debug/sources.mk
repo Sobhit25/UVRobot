@@ -22,7 +22,7 @@ OBJCOPY_BIN :=
 SUBDIRS := \
 Core/Src \
 Core/Startup \
-Device_Libs/Src \
+Device_Library/Src \
 Drivers/STM32F4xx_HAL_Driver/Src \
 PID \
 

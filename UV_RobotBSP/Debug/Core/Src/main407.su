@@ -1,5 +1,5 @@
-main407.c:14:5:main	32	static
-main407.c:35:6:SystemClock_Config	4	static
-main407.c:40:6:I2C2_Init	8	static
-main407.c:60:6:USART2_UART_Init	8	static
-main407.c:79:6:Error_Handler	4	static
+main407.c:14:5:main	48	static
+main407.c:66:6:SystemClock_Config	4	static
+main407.c:71:6:I2C2_Init	8	static
+main407.c:91:6:USART2_UART_Init	8	static
+main407.c:110:6:Error_Handler	4	static
